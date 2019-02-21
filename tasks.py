@@ -1,8 +1,12 @@
 import re
-import invoke
+import json
 import toml
+import invoke
 from pathlib import Path
 from time import sleep
+from typing import Sequence
+from urllib.request import urlopen
+from urllib.parse import quote
 from invoke.exceptions import UnexpectedExit
 
 _version_pattern = re.compile(
@@ -11,7 +15,9 @@ _version_pattern = re.compile(
 
 
 @invoke.task
-def upload(ctx, test: bool = False, install: bool = False, n_download_tries: int = 3):
+def upload(
+    ctx, test: bool = False, install: bool = False, n_download_tries: int = 3
+) -> None:
     """
     Assumptions:
     * the project is structured as <name>/<name'> where <name>
@@ -23,9 +29,16 @@ def upload(ctx, test: bool = False, install: bool = False, n_download_tries: int
     * If you use the test flag, you have at least the following in `~/.pypirc`:
       [testpypi]
       repository: https://test.pypi.org/legacy/
+
+    :param ctx: invoke context
+    :param test: whether to upload to normal or test pypi
+    :param install: whether to install the project from test pypi.
+      Only used if `test` is true.
+    :param n_download_tries: how many times to attempt to install the project.
+      After each attempt there is a 5 second sleep period.
     """
 
-    project_name = "wsl-wrappers"
+    project_name = _get_from_pyproject(["tool", "poetry", "name"])
     project_root = str(Path(__file__).parent.resolve())
     sleep_time = 5
 
@@ -83,6 +96,22 @@ def upload(ctx, test: bool = False, install: bool = False, n_download_tries: int
             continue
 
 
+@invoke.task
+def update_tasks(ctx) -> None:
+    """
+    Update the tasks file to the newest version on GitHub.
+
+    :param ctx: invoke context
+    """
+
+    tasks_path = Path(__file__).resolve()
+    github_url = "https://raw.githubusercontent.com/neighthan/cookiecutter-pytemplate/"
+    github_url += quote("master/{{cookiecutter.project_name}}/tasks.py")
+
+    with urlopen(github_url) as new_tasks_file:
+        tasks_path.write_text(new_tasks_file.read().decode())
+
+
 def _get_dev_num(project_name: str, current_version: str) -> int:
     # 1. read the whole suffix
     # 2. replace it by dev<dev_num>
@@ -110,3 +139,11 @@ def _get_dev_num(project_name: str, current_version: str) -> int:
             dev_num = int(groups["suffix"].replace("dev", "")) + 1
             break
     return dev_num
+
+def _get_from_pyproject(keys: Sequence[str]):
+    pyproject = Path(__file__).parent / "pyproject.toml"
+    pyproject = toml.loads(pyproject.read_text())
+    ret = pyproject
+    for key in keys:
+        ret = ret[key]
+    return ret
