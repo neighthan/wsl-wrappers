@@ -10,6 +10,7 @@ authors = ["Nathan Hunt <neighthan.hunt@gmail.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/neighthan/wsl-wrappers"
+include = ["pyproject.toml"]
 
 [tool.poetry.scripts]
 pdf2svg = "wsl_wrappers:scripts_api.pdf2svg"
@@ -23,3 +24,5 @@ toml = "^0.10.0"
 pytest = "^3.0"
 twine = "^1.13"
 invoke = "^1.2"
+pytest-datafiles = "^2.0"
+pre-commit = "^1.14"

@@ -22,5 +22,10 @@ def get_command_pdflatex() -> List[str]:
         print(args[-1])
         args[-1] = get_wsl_path(args[-1])
 
+    for idx, arg in enumerate(args):
+        if arg.strip() == "-output-directory":
+            args[idx + 1] = get_wsl_path(args[idx+1])
+            break
+
     cmd = ["wsl", "pdflatex"] + args
     return cmd
