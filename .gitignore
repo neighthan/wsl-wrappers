@@ -1,4 +1,4 @@
 *.egg-info
 __pycache__
-scripts/git.cmd
-scripts/wslgit.sh
+wsl_wrappers/_scripts/git.cmd
+wsl_wrappers/_scripts/wslgit.sh

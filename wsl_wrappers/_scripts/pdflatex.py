@@ -1,9 +1,10 @@
 import sys
 from argparse import ArgumentParser
-from wsl_wrappers import get_wsl_path, run_command
+from typing import List
+from ..utils import get_wsl_path
 
 
-def get_command_pdflatex() -> str:
+def get_command_pdflatex() -> List[str]:
     # TODO - this one isn't done very well...
     # the last arg is the filename *unless* it's a list of commands, the
     # first of which starts with \. It might be possible that \ is included
@@ -23,7 +24,3 @@ def get_command_pdflatex() -> str:
 
     cmd = ["wsl", "pdflatex"] + args
     return cmd
-
-
-if __name__ == "__main__":
-    run_command(get_command_pdflatex())
