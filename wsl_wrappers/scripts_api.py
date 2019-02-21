@@ -3,9 +3,15 @@ from ._scripts.pdf2svg import get_command_pdf2svg
 from ._scripts.pdflatex import get_command_pdflatex
 
 
-def pdf2svg():
-    run_command(get_command_pdf2svg())
+def pdf2svg(verbose: bool = False):
+    cmd = get_command_pdf2svg()
+    if verbose:
+        print(cmd)
+    run_command(cmd)
 
 
-def pdflatex():
-    run_command(get_command_pdflatex())
+def pdflatex(verbose: bool = False):
+    cmd = get_command_pdflatex()
+    if verbose:
+        print(cmd)
+    run_command(cmd)
