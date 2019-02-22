@@ -9,4 +9,10 @@ install:
   - poetry install
 
 script:
+  - where poetry
+  - poetry run invoke --list
   - poetry run invoke test --cov=.
+
+after_script:
+  - pip install codecov
+  - codecov
