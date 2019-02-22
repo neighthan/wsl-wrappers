@@ -1,4 +1,5 @@
 *.egg-info
 __pycache__
+.coverage
 wsl_wrappers/_scripts/git.cmd
 wsl_wrappers/_scripts/wslgit.sh

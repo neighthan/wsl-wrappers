@@ -1,0 +1,5 @@
+[run]
+branch = True
+omit =
+    tasks.py
+    wsl_wrappers/_fix_invoke.py
