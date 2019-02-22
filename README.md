@@ -12,7 +12,7 @@ This repo contains a set of wrappers that make it easier to call commands in Win
 pip install wsl-wrappers
 ```
 
-The script wrappers are automatically put in your Python scripts directory (e.g. `~/anaconda/bin` on Linux or `%USERPROFILE%\Anaconda\Scripts` on Windows). You should be able to call them directly from the command line.
+The script wrappers are automatically put in your Python scripts directory (e.g. `%USERPROFILE%\Anaconda\Scripts`). You should be able to call them directly from the command line.
 
 ## Related Work
 * [`wslgit`][wslgit] is an excellent project for using WSL's `git` from Windows which also works well with VS Code.
