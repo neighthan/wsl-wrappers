@@ -7,6 +7,7 @@ Assumptions:
 """
 
 import re
+import sys
 import json
 import toml
 import invoke
@@ -16,6 +17,7 @@ from typing import Sequence
 from urllib.request import urlopen
 from urllib.parse import quote
 from invoke.exceptions import UnexpectedExit
+import wsl_wrappers._fix_invoke
 
 _version_pattern = re.compile(
     r"(?P<major>\d+)\.(?P<minor>\d+)\.(?P<micro>\d+)(\.(?P<suffix>[A-z0-9]+))?"
@@ -25,6 +27,21 @@ _extra_url = "--extra-index-url https://pypi.org/simple"  # for dependencies
 
 
 @invoke.task
+def clean(ctx) -> None:
+    """
+    Remove all .pyc/.pyo files and __pycache__ directories.
+    """
+
+    root_dir = Path(__file__).parent
+
+    for cache_file in root_dir.rglob("*.py[co]"):
+        cache_file.unlink()
+
+    for cache_dir in root_dir.rglob("__pycache__"):
+        cache_dir.rmdir()
+
+
+@invoke.task(clean)
 def publish(
     ctx, test: bool = False, install: bool = False, n_download_tries: int = 3
 ) -> None:
@@ -124,21 +141,6 @@ def update_tasks(ctx) -> None:
 
 
 @invoke.task
-def clean(ctx) -> None:
-    """
-    Remove all .pyc/.pyo files and __pycache__ directories.
-    """
-
-    root_dir = Path(__file__).parent
-
-    for cache_file in root_dir.rglob("*.py[co]"):
-        cache_file.unlink()
-
-    for cache_dir in root_dir.rglob("__pycache__"):
-        cache_dir.rmdir()
-
-
-@invoke.task
 def install(ctx, test: bool = False) -> None:
     """
     Install the latest version of the current project.
@@ -151,6 +153,13 @@ def install(ctx, test: bool = False) -> None:
     project_name = _get_from_pyproject(["tool", "poetry", "name"])
     cmd = "pip install -U {} " + project_name
     cmd = cmd.format(" ".join([_index_url, _extra_url, "--pre"]) if test else "")
+    ctx.run(cmd)
+
+
+@invoke.task(clean, allow_unknown=True)
+def test(ctx) -> None:
+    pytest_args = sys.argv[sys.argv.index("test") + 1:]
+    cmd = "poetry run pytest " + " ".join(pytest_args)
     ctx.run(cmd)
 
 

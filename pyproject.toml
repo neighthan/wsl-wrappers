@@ -23,6 +23,7 @@ toml = "^0.10.0"
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 twine = "^1.13"
-invoke = "^1.2"
+invoke = {git = "https://github.com/neighthan/invoke.git"}
 pytest-datafiles = "^2.0"
 pre-commit = "^1.14"
+pytest-cov = "^2.6"
