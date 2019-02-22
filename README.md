@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/neighthan/wsl-wrappers.svg?branch=master)](https://travis-ci.org/neighthan/wsl-wrappers)
+
 # WSL Wrappers
 
 This repo contains a set of wrappers that make it easier to call commands in Windows Subsystem for Linux (WSL) from Windows. Basically, they are wrappers that do a small amount of path conversion using `wslpath` and then pass the arguments on to the real command in WSL using `wsl`.
