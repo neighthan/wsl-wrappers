@@ -7,6 +7,7 @@ Assumptions:
 """
 
 import re
+import shutil
 import sys
 import json
 import toml
@@ -29,19 +30,30 @@ _extra_url = "--extra-index-url https://pypi.org/simple"  # for dependencies
 @invoke.task
 def clean(ctx) -> None:
     """
-    Remove all .pyc/.pyo files and __pycache__ directories.
+    Remove all temporary files and directories.
+
+    Files / directories removed are:
+      * __pycache__ directories
+      * .coverage files
+      * build and dist directories
     """
 
     root_dir = Path(__file__).parent
 
-    for cache_file in root_dir.rglob("*.py[co]"):
-        cache_file.unlink()
+    rm_file_patterns = [".coverage"]
 
-    for cache_dir in root_dir.rglob("__pycache__"):
-        cache_dir.rmdir()
+    for file_pattern in rm_file_patterns:
+        for rm_file in root_dir.rglob(file_pattern):
+            rm_file.unlink()
+
+    rm_dir_patterns = ["__pycache__", "build", "dist"]
+
+    for dir_pattern in rm_dir_patterns:
+        for rm_dir in root_dir.rglob(dir_pattern):
+            shutil.rmtree(str(rm_dir))
 
 
-@invoke.task(clean)
+@invoke.task(clean, post=[clean])
 def publish(
     ctx, test: bool = False, install: bool = False, n_download_tries: int = 3
 ) -> None:
@@ -95,14 +107,8 @@ def publish(
         cmd = f"""
         cd "{project_root}"
 
-        rm -rf build
-        rm -rf dist
-
         poetry build
         twine upload {'--repository testpypi' if test else ''} dist/*
-
-        rm -rf build
-        rm -rf dist
         """
 
         ctx.run(cmd)
@@ -141,7 +147,7 @@ def update_tasks(ctx) -> None:
 
 
 @invoke.task
-def install(ctx, test: bool = False) -> None:
+def install(ctx, version: str="", test: bool = False) -> None:
     """
     Install the latest version of the current project.
 
@@ -151,7 +157,7 @@ def install(ctx, test: bool = False) -> None:
     """
 
     project_name = _get_from_pyproject(["tool", "poetry", "name"])
-    cmd = "pip install -U {} " + project_name
+    cmd = "pip install -U {} " + project_name + f"=={version}" if version else ""
     cmd = cmd.format(" ".join([_index_url, _extra_url, "--pre"]) if test else "")
     ctx.run(cmd)
 
