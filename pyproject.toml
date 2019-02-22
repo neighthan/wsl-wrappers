@@ -15,6 +15,8 @@ include = ["pyproject.toml"]
 [tool.poetry.scripts]
 pdf2svg = "wsl_wrappers:scripts_api.pdf2svg"
 pdflatex = "wsl_wrappers:scripts_api.pdflatex"
+git = "wsl_wrappers:scripts_api.git"
+install_wgit = "wsl_wrappers:scripts_api.install_wgit"
 
 [tool.poetry.dependencies]
 python = "^3.7"
